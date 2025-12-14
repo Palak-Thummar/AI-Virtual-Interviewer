@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: ai-virtual-interviewer
+  
+  datasource:
+    url: jdbc:mysql://localhost:3306/ai_virtual_interviewer
+    username: root
+    password: your_password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+  
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+# JWT Configuration
+jwt:
+  secret: your_super_secret_jwt_key_change_this_in_production
+  expiration: 86400000 # 24 hours
+
+# OpenAI API Configuration
+openai:
+  api-key: your_openai_api_key
+  model: gpt-4
+  timeout: 30
+
+logging:
+  level:
+    root: INFO
+    com.virtualinterviewer: DEBUG
