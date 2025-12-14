@@ -1,0 +1,68 @@
+# Backend - Java
+backend/target/
+backend/*.jar
+backend/*.war
+backend/.classpath
+backend/.project
+backend/.settings/
+backend/.vscode/
+backend/bin/
+backend/.idea/
+backend/*.iml
+backend/*.iws
+backend/*.ipr
+backend/.DS_Store
+backend/node_modules/
+
+# Frontend - Node
+frontend/node_modules/
+frontend/build/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/.DS_Store
+frontend/.vscode/
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS
+.DS_Store
+Thumbs.db
+.Spotlight-V100
+.Trashes
+
+# Logs
+logs
+*.log
+npm-debug.log
+
+# Dependency
+.gradle
+.m2
+
+# Database
+*.db
+*.sqlite
+
+# Temporary files
+*.tmp
+*.temp
+
+# Secrets
+.env
+.env.local
+secrets.properties
