@@ -3,7 +3,6 @@ package com.virtualinterviewer.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -53,7 +52,11 @@ public class JwtProvider {
                     .build()
                     .parseSignedClaims(token);
             return true;
-        } catch (JwtException | IllegalArgumentException e) {
+        } catch (JwtException e) {
+            System.err.println("JWT validation failed: " + e.getMessage());
+            return false;
+        } catch (IllegalArgumentException e) {
+            System.err.println("JWT token is invalid: " + e.getMessage());
             return false;
         }
     }

@@ -2,16 +2,18 @@ package com.virtualinterviewer.service;
 
 import com.virtualinterviewer.model.InterviewQuestion;
 import com.virtualinterviewer.repository.InterviewQuestionRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class QuestionService {
 
     private final InterviewQuestionRepository questionRepository;
+
+    public QuestionService(InterviewQuestionRepository questionRepository) {
+        this.questionRepository = questionRepository;
+    }
 
     public List<InterviewQuestion> getAllActiveQuestions() {
         return questionRepository.findAllByIsActiveTrue();

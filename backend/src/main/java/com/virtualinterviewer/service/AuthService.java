@@ -8,13 +8,12 @@ import com.virtualinterviewer.model.User;
 import com.virtualinterviewer.repository.AnalyticsRepository;
 import com.virtualinterviewer.repository.UserRepository;
 import com.virtualinterviewer.security.JwtProvider;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
+
 public class AuthService {
 
     private final UserRepository userRepository;
@@ -22,6 +21,14 @@ public class AuthService {
     private final JwtProvider jwtProvider;
     private final PasswordEncoder passwordEncoder;
 
+    public AuthService(AnalyticsRepository analyticsRepository, JwtProvider jwtProvider, PasswordEncoder passwordEncoder, UserRepository userRepository) {
+        this.analyticsRepository = analyticsRepository;
+        this.jwtProvider = jwtProvider;
+        this.passwordEncoder = passwordEncoder;
+        this.userRepository = userRepository;
+    }
+
+    
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("User already exists with this email");

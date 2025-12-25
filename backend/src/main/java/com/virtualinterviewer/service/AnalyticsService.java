@@ -3,15 +3,17 @@ package com.virtualinterviewer.service;
 import com.virtualinterviewer.model.User;
 import com.virtualinterviewer.repository.AnalyticsRepository;
 import com.virtualinterviewer.model.Analytics;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class AnalyticsService {
 
     private final AnalyticsRepository analyticsRepository;
+
+    public AnalyticsService(AnalyticsRepository analyticsRepository) {
+        this.analyticsRepository = analyticsRepository;
+    }
 
     public Analytics getUserAnalytics(User user) {
         Optional<Analytics> analyticsOpt = analyticsRepository.findByUser(user);

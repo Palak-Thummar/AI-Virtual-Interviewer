@@ -1,14 +1,9 @@
 package com.virtualinterviewer.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "feedback")
 public class Feedback {
@@ -18,6 +13,7 @@ public class Feedback {
 
     @ManyToOne
     @JoinColumn(name = "interview_id", nullable = false)
+    @JsonIgnore
     private Interview interview;
 
     @Column(columnDefinition = "TEXT")
@@ -35,4 +31,30 @@ public class Feedback {
     private Double overallScore;
 
     private LocalDateTime generatedAt = LocalDateTime.now();
+
+    public Feedback() {}
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public Interview getInterview() { return interview; }
+    public void setInterview(Interview interview) { this.interview = interview; }
+
+    public String getStrengths() { return strengths; }
+    public void setStrengths(String strengths) { this.strengths = strengths; }
+
+    public String getWeaknesses() { return weaknesses; }
+    public void setWeaknesses(String weaknesses) { this.weaknesses = weaknesses; }
+
+    public String getImprovements() { return improvements; }
+    public void setImprovements(String improvements) { this.improvements = improvements; }
+
+    public String getOverallComments() { return overallComments; }
+    public void setOverallComments(String overallComments) { this.overallComments = overallComments; }
+
+    public Double getOverallScore() { return overallScore; }
+    public void setOverallScore(Double overallScore) { this.overallScore = overallScore; }
+
+    public LocalDateTime getGeneratedAt() { return generatedAt; }
+    public void setGeneratedAt(LocalDateTime generatedAt) { this.generatedAt = generatedAt; }
 }

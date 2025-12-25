@@ -31,7 +31,11 @@ function InterviewPage() {
     try {
       const response = await interviewService.getInterview(interviewId);
       setInterview(response.data);
-      fetchNextQuestion();
+      console.log('Interview updated:', response.data);
+      // Only fetch next question on initial load, not on refresh
+      if (loading) {
+        fetchNextQuestion();
+      }
     } catch (error) {
       toast.error('Failed to load interview');
       navigate('/dashboard');
@@ -43,14 +47,19 @@ function InterviewPage() {
   const fetchNextQuestion = async () => {
     try {
       const response = await interviewService.getNextQuestion(interviewId);
+      console.log('Next question received:', response.data);
       if (response.data !== 'All questions completed') {
-        setCurrentQuestion(response.data);
-        setTimeLeft(response.data.timeLimitSeconds || 60);
-        setAnswerText('');
+        setCurrentQuestion(null); // Force re-render
+        setTimeout(() => {
+          setCurrentQuestion(response.data);
+          setTimeLeft(response.data.timeLimitSeconds || 120);
+          setAnswerText('');
+        }, 100);
       } else {
         handleCompleteInterview();
       }
     } catch (error) {
+      console.error('Fetch next question error:', error);
       toast.error('Failed to load question');
     }
   };
@@ -66,14 +75,41 @@ function InterviewPage() {
       await interviewService.submitAnswer(interviewId, {
         questionId: currentQuestion.id,
         answerText,
-        timeTakenSeconds: currentQuestion.timeLimitSeconds - timeLeft,
+        timeTakenSeconds: (currentQuestion.timeLimitSeconds || 120) - timeLeft,
       });
       toast.success('Answer submitted successfully!');
-      fetchNextQuestion();
+      // Refresh interview state to update question counter
+      await fetchInterview();
+      // Small delay to ensure backend processes the answer before fetching next
+      setTimeout(() => fetchNextQuestion(), 500);
     } catch (error) {
+      console.error('Submit error:', error);
       toast.error('Failed to submit answer');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleSkipQuestion = async () => {
+    if (window.confirm('Are you sure you want to skip this question? You will not receive points for it.')) {
+      setSubmitting(true);
+      try {
+        // Submit empty answer to mark as skipped
+        await interviewService.submitAnswer(interviewId, {
+          questionId: currentQuestion.id,
+          answerText: '[SKIPPED]',
+          timeTakenSeconds: 0,
+        });
+        toast.info('Question skipped');
+        // Refresh interview state to update question counter
+        await fetchInterview();
+        setTimeout(() => fetchNextQuestion(), 500);
+      } catch (error) {
+        console.error('Skip error:', error);
+        toast.error('Failed to skip question');
+      } finally {
+        setSubmitting(false);
+      }
     }
   };
 
@@ -192,7 +228,8 @@ function InterviewPage() {
                   </Button>
                   <Button
                     variant="outline-secondary"
-                    onClick={fetchNextQuestion}
+                    onClick={handleSkipQuestion}
+                    disabled={submitting}
                   >
                     <FiSkipForward className="me-2" />
                     Skip

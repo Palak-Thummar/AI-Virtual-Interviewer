@@ -24,7 +24,8 @@ function DashboardPage() {
       const response = await interviewService.getMyInterviews();
       setInterviews(response.data);
     } catch (error) {
-      toast.error('Failed to load interviews');
+      console.error('Failed to load interviews:', error.response?.data || error.message);
+      toast.error(error.response?.data?.message || 'Failed to load interviews');
     } finally {
       setLoading(false);
     }
@@ -37,7 +38,8 @@ function DashboardPage() {
       toast.success('Interview started!');
       navigate(`/interview/${response.data.id}`);
     } catch (error) {
-      toast.error('Failed to start interview');
+      console.error('Failed to start interview:', error.response?.data || error.message);
+      toast.error(error.response?.data?.message || 'Failed to start interview');
     }
   };
 
@@ -150,19 +152,19 @@ function DashboardPage() {
                     <Card.Body>
                       <Card.Title>{interview.jobRole}</Card.Title>
                       <Card.Text>
-                        <p>
+                        <div>
                           <strong>Domain:</strong> {interview.domain}
-                        </p>
-                        <p>
+                        </div>
+                        <div>
                           <strong>Status:</strong> <span className="badge bg-info">{interview.status}</span>
-                        </p>
-                        <p>
+                        </div>
+                        <div>
                           <strong>Progress:</strong> {interview.questionsAnswered}/{interview.totalQuestions}
-                        </p>
+                        </div>
                         {interview.overallScore && (
-                          <p>
+                          <div>
                             <strong>Score:</strong> {interview.overallScore.toFixed(2)}/100
-                          </p>
+                          </div>
                         )}
                       </Card.Text>
                       <div className="d-flex gap-2">

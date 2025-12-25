@@ -2,7 +2,6 @@ package com.virtualinterviewer.controller;
 
 import com.virtualinterviewer.model.InterviewQuestion;
 import com.virtualinterviewer.service.QuestionService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -10,11 +9,14 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/admin/questions")
-@RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001", "http://localhost:3002"})
 public class AdminQuestionController {
 
     private final QuestionService questionService;
+
+    public AdminQuestionController(QuestionService questionService) {
+        this.questionService = questionService;
+    }
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")

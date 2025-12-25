@@ -4,14 +4,12 @@ import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
 import com.theokanning.openai.service.OpenAiService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class AIService {
 
     @Value("${openai.api-key}")
@@ -25,30 +23,36 @@ public class AIService {
     }
 
     public String generateQuestion(String jobRole, String domain, String difficulty, String resumeContent) {
-        OpenAiService service = getOpenAiService();
+        try {
+            OpenAiService service = getOpenAiService();
 
-        String prompt = String.format(
-                "Generate a challenging %s interview question for a %s position in the %s domain. " +
-                "Difficulty level: %s. " +
-                (resumeContent != null ? "Consider the candidate's resume: %s. " : "") +
-                "Provide only the question without any numbering or extra text.",
-                domain, jobRole, domain, difficulty, resumeContent != null ? resumeContent : ""
-        );
+            String prompt = String.format(
+                    "Generate a challenging %s interview question for a %s position in the %s domain. " +
+                    "Difficulty level: %s. " +
+                    (resumeContent != null ? "Consider the candidate's resume: %s. " : "") +
+                    "Provide only the question without any numbering or extra text.",
+                    domain, jobRole, domain, difficulty, resumeContent != null ? resumeContent : ""
+            );
 
-        ChatCompletionRequest request = ChatCompletionRequest.builder()
-                .model(model)
-                .messages(List.of(new ChatMessage(ChatMessageRole.USER.value(), prompt)))
-                .temperature(0.7)
-                .build();
+            ChatCompletionRequest request = ChatCompletionRequest.builder()
+                    .model(model)
+                    .messages(List.of(new ChatMessage(ChatMessageRole.USER.value(), prompt)))
+                    .temperature(0.7)
+                    .maxTokens(200)
+                    .build();
 
-        String question = service.createChatCompletion(request)
-                .getChoices()
-                .get(0)
-                .getMessage()
-                .getContent();
+            String question = service.createChatCompletion(request)
+                    .getChoices()
+                    .get(0)
+                    .getMessage()
+                    .getContent();
 
-        service.shutdownExecutor();
-        return question;
+            service.shutdownExecutor();
+            return question;
+        } catch (Exception e) {
+            System.err.println("OpenAI API error in generateQuestion: " + e.getMessage());
+            throw new RuntimeException("Failed to generate question via AI", e);
+        }
     }
 
     public String evaluateAnswer(String question, String userAnswer, String domain) {

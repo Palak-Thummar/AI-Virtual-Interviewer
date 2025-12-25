@@ -6,26 +6,35 @@ import com.virtualinterviewer.model.*;
 import com.virtualinterviewer.service.AuthService;
 import com.virtualinterviewer.service.InterviewService;
 import com.virtualinterviewer.service.QuestionService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/interviews")
-@RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001", "http://localhost:3002"})
 public class InterviewController {
 
     private final InterviewService interviewService;
     private final QuestionService questionService;
     private final AuthService authService;
 
-    @PostMapping("/start")
-    public ResponseEntity<?> startInterview(@RequestBody InterviewStartRequest request, Authentication authentication) {
+    public InterviewController(InterviewService interviewService,
+                               QuestionService questionService,
+                               AuthService authService) {
+        this.interviewService = interviewService;
+        this.questionService = questionService;
+        this.authService = authService;
+    }
+
+    @PostMapping("/start")    @Transactional    public ResponseEntity<?> startInterview(@RequestBody InterviewStartRequest request, Authentication authentication) {
         try {
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return ResponseEntity.status(401).body("Error: Unauthorized - No valid authentication");
+            }
             User user = authService.getUserByEmail(authentication.getName());
             Interview interview = interviewService.startInterview(
                     user,
@@ -36,12 +45,12 @@ public class InterviewController {
             );
             return ResponseEntity.ok(interview);
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
     }
 
-    @GetMapping("/{interviewId}")
-    public ResponseEntity<?> getInterview(@PathVariable Long interviewId) {
+    @GetMapping("/{interviewId}")    @Transactional    public ResponseEntity<?> getInterview(@PathVariable Long interviewId) {
         try {
             Optional<Interview> interview = interviewService.getInterviewById(interviewId);
             if (interview.isPresent()) {
@@ -53,8 +62,7 @@ public class InterviewController {
         }
     }
 
-    @GetMapping("/{interviewId}/next-question")
-    public ResponseEntity<?> getNextQuestion(@PathVariable Long interviewId) {
+    @GetMapping("/{interviewId}/next-question")    @Transactional    public ResponseEntity<?> getNextQuestion(@PathVariable Long interviewId) {
         try {
             Optional<Interview> interviewOpt = interviewService.getInterviewById(interviewId);
             if (interviewOpt.isEmpty()) {
@@ -74,8 +82,7 @@ public class InterviewController {
         }
     }
 
-    @PostMapping("/{interviewId}/submit-answer")
-    public ResponseEntity<?> submitAnswer(@PathVariable Long interviewId, @RequestBody SubmitAnswerRequest request) {
+    @PostMapping("/{interviewId}/submit-answer")    @Transactional    public ResponseEntity<?> submitAnswer(@PathVariable Long interviewId, @RequestBody SubmitAnswerRequest request) {
         try {
             Optional<Interview> interviewOpt = interviewService.getInterviewById(interviewId);
             if (interviewOpt.isEmpty()) {
@@ -101,8 +108,7 @@ public class InterviewController {
         }
     }
 
-    @PostMapping("/{interviewId}/complete")
-    public ResponseEntity<?> completeInterview(@PathVariable Long interviewId) {
+    @PostMapping("/{interviewId}/complete")    @Transactional    public ResponseEntity<?> completeInterview(@PathVariable Long interviewId) {
         try {
             Interview interview = interviewService.completeInterview(interviewId);
             return ResponseEntity.ok(interview);
@@ -111,13 +117,16 @@ public class InterviewController {
         }
     }
 
-    @GetMapping("/my-interviews")
-    public ResponseEntity<?> getMyInterviews(Authentication authentication) {
+    @GetMapping("/my-interviews")    @Transactional    public ResponseEntity<?> getMyInterviews(Authentication authentication) {
         try {
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return ResponseEntity.status(401).body("Error: Unauthorized - No valid authentication");
+            }
             User user = authService.getUserByEmail(authentication.getName());
             List<Interview> interviews = interviewService.getUserInterviews(user);
             return ResponseEntity.ok(interviews);
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
     }

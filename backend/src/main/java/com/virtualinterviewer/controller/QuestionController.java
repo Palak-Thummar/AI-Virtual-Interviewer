@@ -2,7 +2,6 @@ package com.virtualinterviewer.controller;
 
 import com.virtualinterviewer.model.InterviewQuestion;
 import com.virtualinterviewer.service.QuestionService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -10,11 +9,14 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/questions")
-@RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001", "http://localhost:3002"})
 public class QuestionController {
 
     private final QuestionService questionService;
+
+    public QuestionController(QuestionService questionService) {
+        this.questionService = questionService;
+    }
 
     @GetMapping("/public/all")
     public ResponseEntity<?> getAllQuestions() {

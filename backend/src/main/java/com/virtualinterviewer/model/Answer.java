@@ -1,14 +1,9 @@
 package com.virtualinterviewer.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "answers")
 public class Answer {
@@ -18,6 +13,7 @@ public class Answer {
 
     @ManyToOne
     @JoinColumn(name = "interview_id", nullable = false)
+    @JsonIgnore
     private Interview interview;
 
     @ManyToOne
@@ -40,4 +36,36 @@ public class Answer {
     private String aiEvaluation;
 
     private boolean isCorrect;
+
+    public Answer() {}
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public Interview getInterview() { return interview; }
+    public void setInterview(Interview interview) { this.interview = interview; }
+
+    public InterviewQuestion getQuestion() { return question; }
+    public void setQuestion(InterviewQuestion question) { this.question = question; }
+
+    public String getAnswerText() { return answerText; }
+    public void setAnswerText(String answerText) { this.answerText = answerText; }
+
+    public String getAnswerAudio() { return answerAudio; }
+    public void setAnswerAudio(String answerAudio) { this.answerAudio = answerAudio; }
+
+    public Integer getTimeTakenSeconds() { return timeTakenSeconds; }
+    public void setTimeTakenSeconds(Integer timeTakenSeconds) { this.timeTakenSeconds = timeTakenSeconds; }
+
+    public LocalDateTime getAnsweredAt() { return answeredAt; }
+    public void setAnsweredAt(LocalDateTime answeredAt) { this.answeredAt = answeredAt; }
+
+    public Double getScore() { return score; }
+    public void setScore(Double score) { this.score = score; }
+
+    public String getAiEvaluation() { return aiEvaluation; }
+    public void setAiEvaluation(String aiEvaluation) { this.aiEvaluation = aiEvaluation; }
+
+    public boolean isCorrect() { return isCorrect; }
+    public void setCorrect(boolean correct) { isCorrect = correct; }
 }

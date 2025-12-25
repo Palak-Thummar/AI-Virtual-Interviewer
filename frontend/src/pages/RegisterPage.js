@@ -32,6 +32,10 @@ function RegisterPage() {
       const response = await authService.register(formData);
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data));
+      
+      // Trigger auth change event for App.js to detect
+      window.dispatchEvent(new Event('auth-change'));
+      
       toast.success('Registration successful!');
       setTimeout(() => navigate('/dashboard'), 1000);
     } catch (error) {

@@ -1,8 +1,7 @@
 import './App.css';
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useAtom } from 'jotai';
-import { authAtom } from './atom/atoms';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './hooks/useAuth';
 
 // Pages
 import LoginPage from './pages/LoginPage';
@@ -16,49 +15,56 @@ import AdminPage from './pages/AdminPage';
 // Components
 import Navbar from './components/Navbar';
 
+const PrivateRoute = ({ children }) => {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? children : <Navigate to="/login" />;
+};
+
+const PublicRoute = ({ children }) => {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? <Navigate to="/dashboard" /> : children;
+};
+
 function App() {
-  const [auth] = useAtom(authAtom);
-
-  React.useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      // Token exists, consider user as logged in
-    }
-  }, []);
-
-  const isAuthenticated = localStorage.getItem('token');
+  const { isAuthenticated } = useAuth();
 
   return (
-    <Router>
+    <>
       {isAuthenticated && <Navbar />}
       <div className="app-container">
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+          <Route 
+            path="/login" 
+            element={<PublicRoute><LoginPage /></PublicRoute>} 
+          />
+          <Route 
+            path="/register" 
+            element={<PublicRoute><RegisterPage /></PublicRoute>} 
+          />
           <Route
             path="/dashboard"
-            element={isAuthenticated ? <DashboardPage /> : <Navigate to="/login" />}
+            element={<PrivateRoute><DashboardPage /></PrivateRoute>}
           />
           <Route
             path="/interview/:interviewId"
-            element={isAuthenticated ? <InterviewPage /> : <Navigate to="/login" />}
+            element={<PrivateRoute><InterviewPage /></PrivateRoute>}
           />
           <Route
             path="/results/:interviewId"
-            element={isAuthenticated ? <ResultsPage /> : <Navigate to="/login" />}
+            element={<PrivateRoute><ResultsPage /></PrivateRoute>}
           />
           <Route
             path="/analytics"
-            element={isAuthenticated ? <AnalyticsPage /> : <Navigate to="/login" />}
+            element={<PrivateRoute><AnalyticsPage /></PrivateRoute>}
           />
           <Route
             path="/admin"
-            element={isAuthenticated ? <AdminPage /> : <Navigate to="/login" />}
+            element={<PrivateRoute><AdminPage /></PrivateRoute>}
           />
           <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
         </Routes>
       </div>
-    </Router>
+    </>
   );
 }
 
