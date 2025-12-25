@@ -66,3 +66,4 @@ npm-debug.log
 .env
 .env.local
 secrets.properties
+"target/"  
